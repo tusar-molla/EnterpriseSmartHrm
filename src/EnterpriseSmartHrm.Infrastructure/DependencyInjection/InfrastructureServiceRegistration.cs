@@ -1,5 +1,6 @@
 using EnterpriseSmartHrm.Application.Common.Abstractions;
 using EnterpriseSmartHrm.Infrastructure.Database;
+using EnterpriseSmartHrm.Infrastructure.System;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -20,6 +21,7 @@ public static class InfrastructureServiceRegistration
 
         services.AddSingleton<IDbConnectionFactory>(_ =>
             new SqlServerConnectionFactory(connectionString));
+        services.AddSingleton<IDateTimeProvider, SystemDateTimeProvider>();
 
         return services;
     }

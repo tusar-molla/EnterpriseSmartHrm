@@ -2,6 +2,8 @@ using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
 using EnterpriseSmartHrm.Api.Extensions;
 using EnterpriseSmartHrm.Api.Middleware;
+using EnterpriseSmartHrm.Api.Services;
+using EnterpriseSmartHrm.Application.Common.Abstractions;
 using EnterpriseSmartHrm.Application.DependencyInjection;
 using EnterpriseSmartHrm.Infrastructure.DependencyInjection;
 using Microsoft.OpenApi;
@@ -25,6 +27,8 @@ try
     builder.Services.AddApplicationServices();
     builder.Services.AddInfrastructureServices(builder.Configuration);
     builder.Services.AddJwtAuthentication(builder.Configuration);
+    builder.Services.AddHttpContextAccessor();
+    builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 
     builder.Services
         .AddApiVersioning(options =>
