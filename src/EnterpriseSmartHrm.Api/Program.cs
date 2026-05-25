@@ -1,5 +1,6 @@
 using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
+using EnterpriseSmartHrm.Api.Extensions;
 using EnterpriseSmartHrm.Api.Middleware;
 using EnterpriseSmartHrm.Application.DependencyInjection;
 using EnterpriseSmartHrm.Infrastructure.DependencyInjection;
@@ -23,6 +24,7 @@ try
     builder.Services.AddControllers();
     builder.Services.AddApplicationServices();
     builder.Services.AddInfrastructureServices(builder.Configuration);
+    builder.Services.AddJwtAuthentication(builder.Configuration);
 
     builder.Services
         .AddApiVersioning(options =>
@@ -93,6 +95,7 @@ try
 
     app.UseHttpsRedirection();
 
+    app.UseAuthentication();
     app.UseAuthorization();
 
     app.MapControllers();
