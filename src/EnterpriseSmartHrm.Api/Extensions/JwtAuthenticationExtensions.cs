@@ -1,5 +1,7 @@
+using EnterpriseSmartHrm.Api.Authorization;
 using EnterpriseSmartHrm.Application.Common.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using System.Text;
@@ -56,7 +58,19 @@ public static class JwtAuthenticationExtensions
                 };
             });
 
-        services.AddAuthorization();
+        services.AddAuthorization(options =>
+        {
+            foreach (var permission in PermissionConstants.All.Distinct(StringComparer.OrdinalIgnoreCase))
+            {
+                options.AddPolicy(permission, policy =>
+                {
+                    policy.RequireAuthenticatedUser();
+                    policy.AddRequirements(new PermissionRequirement(permission));
+                });
+            }
+        });
+
+        services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
 
         return services;
     }

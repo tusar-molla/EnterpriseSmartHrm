@@ -1,4 +1,5 @@
 using EnterpriseSmartHrm.Application.Common.Abstractions;
+using EnterpriseSmartHrm.Infrastructure.AuditLogs;
 using EnterpriseSmartHrm.Infrastructure.Database;
 using EnterpriseSmartHrm.Infrastructure.System;
 using Microsoft.Extensions.Configuration;
@@ -22,6 +23,7 @@ public static class InfrastructureServiceRegistration
         services.AddSingleton<IDbConnectionFactory>(_ =>
             new SqlServerConnectionFactory(connectionString));
         services.AddSingleton<IDateTimeProvider, SystemDateTimeProvider>();
+        services.AddScoped<IAuditLogService, AuditLogService>();
 
         return services;
     }
