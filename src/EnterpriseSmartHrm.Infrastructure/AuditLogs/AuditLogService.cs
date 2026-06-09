@@ -10,10 +10,7 @@ public sealed class AuditLogService : IAuditLogService
     private readonly IDateTimeProvider _dateTime;
     private readonly ILogger<AuditLogService> _logger;
 
-    public AuditLogService(
-        ICurrentUserService currentUser,
-        IDateTimeProvider dateTime,
-        ILogger<AuditLogService> logger)
+    public AuditLogService(ICurrentUserService currentUser,IDateTimeProvider dateTime,ILogger<AuditLogService> logger)
     {
         _currentUser = currentUser;
         _dateTime = dateTime;
