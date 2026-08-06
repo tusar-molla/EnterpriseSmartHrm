@@ -9,7 +9,6 @@
   <ItemGroup>
     <ProjectReference Include="..\EnterpriseSmartHrm.Application\EnterpriseSmartHrm.Application.csproj" />
     <ProjectReference Include="..\EnterpriseSmartHrm.Infrastructure\EnterpriseSmartHrm.Infrastructure.csproj" />
-    <ProjectReference Include="..\EnterpriseSmartHrm.Contracts\EnterpriseSmartHrm.Contracts.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -2,6 +2,7 @@ using EnterpriseSmartHrm.Application.Authentication.Abstractions;
 using EnterpriseSmartHrm.Application.Common.Abstractions;
 using EnterpriseSmartHrm.Application.Common.Security;
 using EnterpriseSmartHrm.Infrastructure.Authentication;
+using EnterpriseSmartHrm.Infrastructure.Authentication.Repositories;
 using EnterpriseSmartHrm.Infrastructure.AuditLogs;
 using EnterpriseSmartHrm.Infrastructure.Database;
 using EnterpriseSmartHrm.Infrastructure.System;
@@ -44,6 +45,10 @@ public static class InfrastructureServiceRegistration
                 jwtSettings,
                 serviceProvider.GetRequiredService<IDateTimeProvider>()));
         services.AddScoped<IAuditLogService, AuditLogService>();
+
+        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+        services.AddScoped<ILoginHistoryRepository, LoginHistoryRepository>();
 
         return services;
     }

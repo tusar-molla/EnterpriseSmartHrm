@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using System.Text.Json;
 using EnterpriseSmartHrm.Application.Common.Exceptions;
-using EnterpriseSmartHrm.Contracts.Common;
+using EnterpriseSmartHrm.Application.Contracts.Common;
 using FluentValidation;
 
 namespace EnterpriseSmartHrm.Api.Middleware;

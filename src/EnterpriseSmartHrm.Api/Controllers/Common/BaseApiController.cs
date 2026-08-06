@@ -1,5 +1,5 @@
 ﻿using EnterpriseSmartHrm.Application.Common.Models;
-using EnterpriseSmartHrm.Contracts.Common;
+using EnterpriseSmartHrm.Application.Contracts.Common;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EnterpriseSmartHrm.Api.Controllers.Common;

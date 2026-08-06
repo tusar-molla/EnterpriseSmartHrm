@@ -2,7 +2,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\EnterpriseSmartHrm.Domain\EnterpriseSmartHrm.Domain.csproj" />
-    <ProjectReference Include="..\EnterpriseSmartHrm.Contracts\EnterpriseSmartHrm.Contracts.csproj" />
   </ItemGroup>
 
   <ItemGroup>
