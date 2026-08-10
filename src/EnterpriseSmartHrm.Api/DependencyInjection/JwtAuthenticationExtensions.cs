@@ -6,7 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using System.Text;
 
-namespace EnterpriseSmartHrm.Api.Extensions;
+namespace EnterpriseSmartHrm.Api.DependencyInjection;
 
 public static class JwtAuthenticationExtensions
 {

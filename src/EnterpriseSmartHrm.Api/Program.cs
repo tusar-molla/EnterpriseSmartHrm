@@ -1,14 +1,11 @@
 using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
-using EnterpriseSmartHrm.Api.Extensions;
-using EnterpriseSmartHrm.Api.HealthChecks;
+using EnterpriseSmartHrm.Api.DependencyInjection;
 using EnterpriseSmartHrm.Api.Middleware;
 using EnterpriseSmartHrm.Api.Services;
 using EnterpriseSmartHrm.Application.Common.Abstractions;
 using EnterpriseSmartHrm.Application.DependencyInjection;
 using EnterpriseSmartHrm.Infrastructure.DependencyInjection;
-using Microsoft.AspNetCore.Diagnostics.HealthChecks;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.OpenApi;
 using Serilog;
 
@@ -32,17 +29,6 @@ try
     builder.Services.AddJwtAuthentication(builder.Configuration);
     builder.Services.AddHttpContextAccessor();
     builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
-    builder.Services
-        .AddHealthChecks()
-        .AddCheck(
-            "self",
-            () => HealthCheckResult.Healthy("Enterprise Smart HRM API is running."),
-            tags: ["live"])
-        .AddCheck<SqlServerHealthCheck>(
-            "sql-server",
-            failureStatus: HealthStatus.Unhealthy,
-            tags: ["ready"],
-            timeout: TimeSpan.FromSeconds(5));
 
     builder.Services
         .AddApiVersioning(options =>
@@ -117,20 +103,6 @@ try
     app.UseAuthorization();
 
     app.MapControllers();
-    app.MapHealthChecks("/health", new HealthCheckOptions
-    {
-        ResponseWriter = HealthCheckResponseWriter.WriteAsync
-    });
-    app.MapHealthChecks("/health/live", new HealthCheckOptions
-    {
-        Predicate = registration => registration.Tags.Contains("live"),
-        ResponseWriter = HealthCheckResponseWriter.WriteAsync
-    });
-    app.MapHealthChecks("/health/ready", new HealthCheckOptions
-    {
-        Predicate = registration => registration.Tags.Contains("ready"),
-        ResponseWriter = HealthCheckResponseWriter.WriteAsync
-    });
 
     app.Run();
 }
