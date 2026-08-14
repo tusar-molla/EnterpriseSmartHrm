@@ -1,10 +1,9 @@
-using EnterpriseSmartHrm.Application.Authentication.Abstractions;
-using EnterpriseSmartHrm.Application.Authentication.Models;
 using EnterpriseSmartHrm.Application.Common.Security;
+using EnterpriseSmartHrm.Application.Features.Authentication.Interfaces;
 using System.Globalization;
 using System.Security.Cryptography;
 
-namespace EnterpriseSmartHrm.Infrastructure.Authentication;
+namespace EnterpriseSmartHrm.Infrastructure.Services;
 
 public sealed class Pbkdf2PasswordHasher : IPasswordHasher
 {

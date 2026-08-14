@@ -1,7 +1,6 @@
-using EnterpriseSmartHrm.Application.Authentication.Abstractions;
-using EnterpriseSmartHrm.Application.Authentication.Models;
-using EnterpriseSmartHrm.Application.Common.Abstractions;
+using EnterpriseSmartHrm.Application.Common.Interfaces;
 using EnterpriseSmartHrm.Application.Common.Security;
+using EnterpriseSmartHrm.Application.Features.Authentication.Interfaces;
 using EnterpriseSmartHrm.Domain.Authentication;
 using Microsoft.IdentityModel.Tokens;
 using System.Globalization;
@@ -10,7 +9,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace EnterpriseSmartHrm.Infrastructure.Authentication;
+namespace EnterpriseSmartHrm.Infrastructure.Services;
 
 public sealed class JwtTokenService : ITokenService
 {

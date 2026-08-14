@@ -1,6 +1,4 @@
-using EnterpriseSmartHrm.Application.Authentication.Models;
-
-namespace EnterpriseSmartHrm.Application.Authentication.Abstractions;
+namespace EnterpriseSmartHrm.Application.Features.Authentication.Interfaces;
 
 public interface IPasswordHasher
 {
@@ -9,4 +7,11 @@ public interface IPasswordHasher
     PasswordVerificationResult Verify(
         string password,
         string passwordHash);
+}
+
+public enum PasswordVerificationResult
+{
+    Failed = 0,
+    Success = 1,
+    SuccessRehashNeeded = 2
 }

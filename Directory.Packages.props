@@ -2,9 +2,9 @@
   <PropertyGroup>
     <!-- Enable central package management, https://learn.microsoft.com/en-us/nuget/consume-packages/Central-Package-Management -->
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <!-- Lets the pins below also apply to transitive dependencies. -->
+    <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
   </PropertyGroup>
-  <ItemGroup>
-  </ItemGroup>
   <ItemGroup>
     <PackageVersion Include="Asp.Versioning.Mvc" Version="10.0.0" />
     <PackageVersion Include="Asp.Versioning.Mvc.ApiExplorer" Version="10.0.0" />
@@ -25,5 +25,12 @@
     <PackageVersion Include="Serilog.Sinks.File" Version="7.0.0" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="10.1.7" />
     <PackageVersion Include="System.IdentityModel.Tokens.Jwt" Version="8.18.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Transitive pins: not referenced directly by any project, pinned to clear
+         security advisories in the versions Swashbuckle/AspNetCore.OpenApi resolve.
+         Microsoft.OpenApi is held on 2.x on purpose - 3.x is a breaking API change
+         and Program.cs uses OpenApiInfo/OpenApiSecurityScheme directly. -->
+    <PackageVersion Include="Microsoft.OpenApi" Version="2.12.0" />
   </ItemGroup>
 </Project>

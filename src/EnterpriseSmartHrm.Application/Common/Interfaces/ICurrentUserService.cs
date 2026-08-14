@@ -1,4 +1,4 @@
-namespace EnterpriseSmartHrm.Application.Common.Abstractions;
+namespace EnterpriseSmartHrm.Application.Common.Interfaces;
 
 public interface ICurrentUserService
 {

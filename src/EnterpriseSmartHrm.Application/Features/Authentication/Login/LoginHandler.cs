@@ -1,13 +1,12 @@
-using EnterpriseSmartHrm.Application.Authentication.Abstractions;
-using EnterpriseSmartHrm.Application.Authentication.Models;
-using EnterpriseSmartHrm.Application.Common.Abstractions;
+using EnterpriseSmartHrm.Application.Common.Interfaces;
 using EnterpriseSmartHrm.Application.Common.Models;
+using EnterpriseSmartHrm.Application.Features.Authentication.Interfaces;
 using EnterpriseSmartHrm.Domain.Authentication;
 using MediatR;
 
 namespace EnterpriseSmartHrm.Application.Features.Authentication.Login;
 
-public sealed class LoginHandler : IRequestHandler<LoginCommand, Result<LoginResponse>>
+public sealed class LoginHandler : IRequestHandler<LoginCommand, Result<AuthenticationResponse>>
 {
     private const int MaximumFailedAttempts = 5;
     private static readonly TimeSpan LockoutDuration = TimeSpan.FromMinutes(15);
@@ -36,7 +35,7 @@ public sealed class LoginHandler : IRequestHandler<LoginCommand, Result<LoginRes
         _dateTimeProvider = dateTimeProvider;
     }
 
-    public async Task<Result<LoginResponse>> Handle(LoginCommand request, CancellationToken cancellationToken)
+    public async Task<Result<AuthenticationResponse>> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
         var utcNow = _dateTimeProvider.UtcNow;
         var normalized = request.UsernameOrEmail.Trim().ToUpperInvariant();
@@ -46,20 +45,20 @@ public sealed class LoginHandler : IRequestHandler<LoginCommand, Result<LoginRes
         if (user is null)
         {
             await RecordLoginAsync(request, null, false, "User not found.", utcNow, cancellationToken);
-            return Result<LoginResponse>.Unauthorized(InvalidCredentialsMessage);
+            return Result<AuthenticationResponse>.Unauthorized(InvalidCredentialsMessage);
         }
 
         if (user.IsLockedOut(utcNow))
         {
             await RecordLoginAsync(request, user.Id, false, "Account locked out.", utcNow, cancellationToken);
-            return Result<LoginResponse>.Forbidden(
+            return Result<AuthenticationResponse>.Forbidden(
                 "Account is temporarily locked due to multiple failed login attempts. Please try again later.");
         }
 
         if (!user.IsActive)
         {
             await RecordLoginAsync(request, user.Id, false, "Account inactive.", utcNow, cancellationToken);
-            return Result<LoginResponse>.Forbidden("Account is inactive. Please contact your administrator.");
+            return Result<AuthenticationResponse>.Forbidden("Account is inactive. Please contact your administrator.");
         }
 
         var verification = _passwordHasher.Verify(request.Password, user.PasswordHash);
@@ -69,7 +68,7 @@ public sealed class LoginHandler : IRequestHandler<LoginCommand, Result<LoginRes
             user.RecordFailedLogin(utcNow, MaximumFailedAttempts, LockoutDuration);
             await _userRepository.UpdateAsync(user, cancellationToken);
             await RecordLoginAsync(request, user.Id, false, "Invalid password.", utcNow, cancellationToken);
-            return Result<LoginResponse>.Unauthorized(InvalidCredentialsMessage);
+            return Result<AuthenticationResponse>.Unauthorized(InvalidCredentialsMessage);
         }
 
         if (verification == PasswordVerificationResult.SuccessRehashNeeded)
@@ -98,7 +97,7 @@ public sealed class LoginHandler : IRequestHandler<LoginCommand, Result<LoginRes
         await _userRepository.UpdateAsync(user, cancellationToken);
         await RecordLoginAsync(request, user.Id, true, null, utcNow, cancellationToken);
 
-        var response = new LoginResponse
+        var response = new AuthenticationResponse
         {
             AccessToken = accessToken.Value,
             AccessTokenExpiresAtUtc = accessToken.ExpiresAtUtc,
@@ -111,7 +110,7 @@ public sealed class LoginHandler : IRequestHandler<LoginCommand, Result<LoginRes
             Permissions = permissions
         };
 
-        return Result<LoginResponse>.Success(response, "Login successful.");
+        return Result<AuthenticationResponse>.Success(response, "Login successful.");
     }
 
     private Task RecordLoginAsync(

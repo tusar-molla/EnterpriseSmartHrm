@@ -1,8 +1,7 @@
 ﻿using EnterpriseSmartHrm.Application.Common.Models;
-using EnterpriseSmartHrm.Application.Contracts.Common;
 using Microsoft.AspNetCore.Mvc;
 
-namespace EnterpriseSmartHrm.Api.Controllers.Common;
+namespace EnterpriseSmartHrm.Api.Controllers;
 
 [ApiController]
 public abstract class BaseApiController : ControllerBase

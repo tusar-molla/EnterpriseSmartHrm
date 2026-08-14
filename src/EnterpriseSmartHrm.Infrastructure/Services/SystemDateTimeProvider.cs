@@ -1,6 +1,6 @@
-using EnterpriseSmartHrm.Application.Common.Abstractions;
+using EnterpriseSmartHrm.Application.Common.Interfaces;
 
-namespace EnterpriseSmartHrm.Infrastructure.System;
+namespace EnterpriseSmartHrm.Infrastructure.Services;
 
 public sealed class SystemDateTimeProvider : IDateTimeProvider
 {

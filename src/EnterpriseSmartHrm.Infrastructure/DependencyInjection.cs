@@ -1,17 +1,15 @@
-using EnterpriseSmartHrm.Application.Authentication.Abstractions;
-using EnterpriseSmartHrm.Application.Common.Abstractions;
+using EnterpriseSmartHrm.Application.Common.Interfaces;
 using EnterpriseSmartHrm.Application.Common.Security;
-using EnterpriseSmartHrm.Infrastructure.Authentication;
-using EnterpriseSmartHrm.Infrastructure.Authentication.Repositories;
-using EnterpriseSmartHrm.Infrastructure.AuditLogs;
+using EnterpriseSmartHrm.Application.Features.Authentication.Interfaces;
 using EnterpriseSmartHrm.Infrastructure.Database;
-using EnterpriseSmartHrm.Infrastructure.System;
+using EnterpriseSmartHrm.Infrastructure.Repositories;
+using EnterpriseSmartHrm.Infrastructure.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace EnterpriseSmartHrm.Infrastructure.DependencyInjection;
+namespace EnterpriseSmartHrm.Infrastructure;
 
-public static class InfrastructureServiceRegistration
+public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructureServices(
         this IServiceCollection services,

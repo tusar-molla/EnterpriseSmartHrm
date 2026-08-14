@@ -1,4 +1,4 @@
-namespace EnterpriseSmartHrm.Application.Contracts.Common;
+namespace EnterpriseSmartHrm.Application.Common.Models;
 
 public sealed record ApiResponse<T>
 {

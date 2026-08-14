@@ -1,12 +1,12 @@
-using EnterpriseSmartHrm.Application.Common.Behaviors;
+using EnterpriseSmartHrm.Application.Common.Pipeline;
 using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
-namespace EnterpriseSmartHrm.Application.DependencyInjection;
+namespace EnterpriseSmartHrm.Application;
 
-public static class ApplicationServiceRegistration
+public static class DependencyInjection
 {
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {

@@ -1,11 +1,11 @@
 using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
-using EnterpriseSmartHrm.Api.DependencyInjection;
+using EnterpriseSmartHrm.Api.Extensions;
 using EnterpriseSmartHrm.Api.Middleware;
 using EnterpriseSmartHrm.Api.Services;
-using EnterpriseSmartHrm.Application.Common.Abstractions;
-using EnterpriseSmartHrm.Application.DependencyInjection;
-using EnterpriseSmartHrm.Infrastructure.DependencyInjection;
+using EnterpriseSmartHrm.Application;
+using EnterpriseSmartHrm.Application.Common.Interfaces;
+using EnterpriseSmartHrm.Infrastructure;
 using Microsoft.OpenApi;
 using Serilog;
 
@@ -24,6 +24,8 @@ try
         .Enrich.WithProperty("Application", "EnterpriseSmartHrm.Api"));
 
     builder.Services.AddControllers();
+    builder.Services.AddRouting(options => options.LowercaseUrls = true);
+    builder.Services.AddHealthChecks();
     builder.Services.AddApplicationServices();
     builder.Services.AddInfrastructureServices(builder.Configuration);
     builder.Services.AddJwtAuthentication(builder.Configuration);
@@ -103,6 +105,7 @@ try
     app.UseAuthorization();
 
     app.MapControllers();
+    app.MapHealthChecks("/health").AllowAnonymous();
 
     app.Run();
 }

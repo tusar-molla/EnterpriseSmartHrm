@@ -1,4 +1,4 @@
-using EnterpriseSmartHrm.Application.Common.Abstractions;
+using EnterpriseSmartHrm.Application.Common.Interfaces;
 using Microsoft.Data.SqlClient;
 using System.Data.Common;
 

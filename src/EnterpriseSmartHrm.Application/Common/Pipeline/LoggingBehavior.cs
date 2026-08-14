@@ -2,7 +2,7 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 
-namespace EnterpriseSmartHrm.Application.Common.Behaviors;
+namespace EnterpriseSmartHrm.Application.Common.Pipeline;
 
 public sealed class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     where TRequest : notnull

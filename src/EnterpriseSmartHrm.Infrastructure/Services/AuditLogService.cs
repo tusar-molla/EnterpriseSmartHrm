@@ -1,8 +1,8 @@
-using EnterpriseSmartHrm.Application.Common.Abstractions;
+using EnterpriseSmartHrm.Application.Common.Interfaces;
 using EnterpriseSmartHrm.Application.Common.Models;
 using Microsoft.Extensions.Logging;
 
-namespace EnterpriseSmartHrm.Infrastructure.AuditLogs;
+namespace EnterpriseSmartHrm.Infrastructure.Services;
 
 public sealed class AuditLogService : IAuditLogService
 {

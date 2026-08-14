@@ -1,62 +1,84 @@
 # Features — Vertical Slices
 
-Every feature lives in **one folder**. You should never have to jump across
-`Commands/`, `Queries/`, `Validators/`, `Handlers/` to build or read a single use case.
+Every use case lives in **one folder**. You should never have to jump across
+`Commands/`, `Queries/`, `Validators/`, `Handlers/` to read a single use case.
 
 ## The rule
 
 ```
 Features/
-  <Module>/            e.g. Employees, Attendance, Leave, Payroll
-    <UseCase>/         e.g. CreateEmployee, GetEmployeeById
-      <UseCase>Command.cs   (or <UseCase>Query.cs)  -> the request + its response DTO
-      <UseCase>Handler.cs   -> IRequestHandler, talks to the DB via IDbConnectionFactory (Dapper)
-      <UseCase>Validator.cs -> FluentValidation rules (only if the request needs validation)
+  <Module>/                     e.g. Employees, Attendance, Leave, Payroll
+    Interfaces/                 interfaces for the whole module
+      I<Entity>Repository.cs    data access contract  (implemented in Infrastructure)
+      I<Thing>Service.cs        service contract, plus any small return types it needs
+    <UseCase>/                  e.g. CreateEmployee, GetEmployeeById, ApproveLeave
+      <UseCase>Command.cs       the request + its response DTO   (or <UseCase>Query.cs)
+      <UseCase>Handler.cs       IRequestHandler — business logic
+      <UseCase>Validator.cs     FluentValidation rules (only if the request takes input)
 ```
 
-- **Commands** change state (Create/Update/Delete/Approve). **Queries** only read.
-- Handlers return `Result` / `Result<T>` (see `Common/Models/Result.cs`).
-- The controller stays tiny — it just does `FromResult(await mediator.Send(cmd))`
-  (see `Api/Controllers/Common/BaseApiController.cs`).
-- Validation, logging, and exception handling are already wired as MediatR pipeline
-  behaviors (`Common/Behaviors/`), so handlers only contain business logic.
+- **Commands** change state (Create/Update/Approve/Finalize). **Queries** only read.
+- Handlers return `Result` / `Result<T>` — see `Common/Models/Result.cs`. Throw only
+  for unexpected system failures, never for validation or business rejections.
+- **Handlers never touch Dapper, SQL, or a connection.** They depend on the interfaces
+  in `Interfaces/`. All SQL lives in `Infrastructure/Repositories/`. This keeps the
+  Application project free of infrastructure and keeps handlers unit-testable with a mock.
+- Request/response DTOs live **inside the slice** that owns them. Only genuinely shared
+  shapes (`ApiResponse<T>`, `PagedResponse<T>`, `PaginationQuery`) live in `Common/Models/`.
+- Controllers stay tiny: `FromResult(await _sender.Send(command, ct))`.
+- Validation, logging and exception handling are already wired as MediatR pipeline
+  behaviors (`Common/Pipeline/`), so handlers contain business logic only.
+
+**`Features/Authentication/` is the reference implementation.** Copy its shape.
+
+## Adding a module — the 6 files
+
+| # | File | Project |
+|---|------|---------|
+| 1 | `<Module>/<Entity>.cs` | Domain |
+| 2 | `Features/<Module>/Interfaces/I<Entity>Repository.cs` | Application |
+| 3 | `Features/<Module>/<UseCase>/<UseCase>Command.cs` | Application |
+| 4 | `Features/<Module>/<UseCase>/<UseCase>Handler.cs` (+ `Validator.cs`) | Application |
+| 5 | `Repositories/<Entity>Repository.cs` — **the only place SQL lives** | Infrastructure |
+| 6 | `Controllers/<Module>Controller.cs` | Api |
+
+Then register the repository in `Infrastructure/DependencyInjection.cs`.
+MediatR handlers and FluentValidation validators are picked up by assembly scan, so
+**the slice itself needs no DI wiring** — only the repository does.
 
 ## Minimal example (Create Employee)
 
+`Features/Employees/Interfaces/IEmployeeRepository.cs`
+```csharp
+namespace EnterpriseSmartHrm.Application.Features.Employees.Interfaces;
+
+public interface IEmployeeRepository
+{
+    Task<int> CreateAsync(Employee employee, CancellationToken cancellationToken = default);
+    Task<bool> EmailExistsAsync(string email, CancellationToken cancellationToken = default);
+}
+```
+
 `Features/Employees/CreateEmployee/CreateEmployeeCommand.cs`
 ```csharp
-using MediatR;
-using EnterpriseSmartHrm.Application.Common.Models;
-
-namespace EnterpriseSmartHrm.Application.Features.Employees.CreateEmployee;
-
-public record CreateEmployeeCommand(string FirstName, string LastName, string Email)
+public sealed record CreateEmployeeCommand(string FirstName, string LastName, string Email)
     : IRequest<Result<int>>;
 ```
 
 `Features/Employees/CreateEmployee/CreateEmployeeHandler.cs`
 ```csharp
-using Dapper;
-using MediatR;
-using EnterpriseSmartHrm.Application.Common.Abstractions;
-using EnterpriseSmartHrm.Application.Common.Models;
-
-namespace EnterpriseSmartHrm.Application.Features.Employees.CreateEmployee;
-
-public class CreateEmployeeHandler(IDbConnectionFactory db)
+public sealed class CreateEmployeeHandler(IEmployeeRepository employees)
     : IRequestHandler<CreateEmployeeCommand, Result<int>>
 {
     public async Task<Result<int>> Handle(CreateEmployeeCommand request, CancellationToken ct)
     {
-        using var connection = await db.CreateOpenConnectionAsync(ct);
+        if (await employees.EmailExistsAsync(request.Email, ct))
+        {
+            return Result<int>.Failure("An employee with this email already exists.");
+        }
 
-        const string sql = """
-            INSERT INTO Employees (FirstName, LastName, Email)
-            OUTPUT INSERTED.Id
-            VALUES (@FirstName, @LastName, @Email);
-            """;
+        var id = await employees.CreateAsync(new Employee { /* map */ }, ct);
 
-        var id = await connection.ExecuteScalarAsync<int>(sql, request);
         return Result<int>.Success(id, "Employee created.");
     }
 }
@@ -64,11 +86,7 @@ public class CreateEmployeeHandler(IDbConnectionFactory db)
 
 `Features/Employees/CreateEmployee/CreateEmployeeValidator.cs`
 ```csharp
-using FluentValidation;
-
-namespace EnterpriseSmartHrm.Application.Features.Employees.CreateEmployee;
-
-public class CreateEmployeeValidator : AbstractValidator<CreateEmployeeCommand>
+public sealed class CreateEmployeeValidator : AbstractValidator<CreateEmployeeCommand>
 {
     public CreateEmployeeValidator()
     {
@@ -79,18 +97,16 @@ public class CreateEmployeeValidator : AbstractValidator<CreateEmployeeCommand>
 }
 ```
 
-That's the whole pattern. MediatR and FluentValidation are auto-registered by assembly
-scan (`DependencyInjection/ApplicationServiceRegistration.cs`), so **new slices need no
-DI wiring** — just drop the folder in and add a 3-line controller action.
+That's the whole pattern. Every other feature is the same shape.
 
-## Build order (from the project doc, Section 12)
+## Build order
 
-1. **Employees** — CreateEmployee, GetEmployeeById, ListEmployees, UpdateEmployee
-2. **Organization** — Departments, Designations, Shifts, Locations, Holidays
-3. **Attendance** — CheckIn, CheckOut, ManualAttendance, MonthlySummary
-4. **Leave** — LeaveTypes, ApplyLeave, ApproveLeave, LeaveBalance
-5. **Payroll** — SalaryComponents, SalaryStructure, GeneratePayroll, Payslip
+1. **Employees** — CreateEmployee, GetEmployeeById, ListEmployees, UpdateEmployee, UpdateStatus
+2. **Organization** — Departments, Designations, Locations, Shifts, Holidays
+3. **Attendance** — CheckIn, CheckOut, ManualAttendance, MonthlySummary, CorrectionRequest
+4. **Leave** — LeaveTypes, ApplyLeave, ApproveLeave, LeaveBalance, Calendar
+5. **Payroll** — SalaryComponents, SalaryStructure, GeneratePayroll, Finalize, Payslip
 6. **Reports & Dashboard**
 
-Build **one full slice end-to-end** (Employee CreateEmployee) before anything else —
-once it works, every other feature is the same shape.
+Build **one full slice end-to-end** (`Employees/CreateEmployee`) before starting anything
+else — once that works, the rest is repetition.

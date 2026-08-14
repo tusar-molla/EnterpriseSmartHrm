@@ -1,7 +1,6 @@
-using EnterpriseSmartHrm.Application.Authentication.Models;
 using EnterpriseSmartHrm.Domain.Authentication;
 
-namespace EnterpriseSmartHrm.Application.Authentication.Abstractions;
+namespace EnterpriseSmartHrm.Application.Features.Authentication.Interfaces;
 
 public interface ITokenService
 {
@@ -14,3 +13,12 @@ public interface ITokenService
 
     string HashRefreshToken(string refreshToken);
 }
+
+public sealed record GeneratedAccessToken(
+    string Value,
+    DateTime ExpiresAtUtc);
+
+public sealed record GeneratedRefreshToken(
+    string Value,
+    string Hash,
+    DateTime ExpiresAtUtc);

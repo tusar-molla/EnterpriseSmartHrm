@@ -1,10 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
-
-  <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-  </PropertyGroup>
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <ItemGroup>
     <ProjectReference Include="..\EnterpriseSmartHrm.Application\EnterpriseSmartHrm.Application.csproj" />
@@ -25,4 +19,3 @@
   </ItemGroup>
 
 </Project>
-

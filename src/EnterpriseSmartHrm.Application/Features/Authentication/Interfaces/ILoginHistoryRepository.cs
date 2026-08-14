@@ -1,6 +1,6 @@
 using EnterpriseSmartHrm.Domain.Authentication;
 
-namespace EnterpriseSmartHrm.Application.Authentication.Abstractions;
+namespace EnterpriseSmartHrm.Application.Features.Authentication.Interfaces;
 
 public interface ILoginHistoryRepository
 {

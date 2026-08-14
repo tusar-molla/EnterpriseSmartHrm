@@ -1,8 +1,7 @@
-﻿using System.Net;
-using System.Text.Json;
+﻿using EnterpriseSmartHrm.Api.Extensions;
 using EnterpriseSmartHrm.Application.Common.Exceptions;
-using EnterpriseSmartHrm.Application.Contracts.Common;
 using FluentValidation;
+using System.Net;
 
 namespace EnterpriseSmartHrm.Api.Middleware;
 
@@ -50,17 +49,7 @@ public sealed class ExceptionHandlingMiddleware
             _logger.LogWarning(exception, "Request failed with {StatusCode}. TraceId: {TraceId}", (int)statusCode, traceId);
         }
 
-        var response = ApiResponse<object>.Fail(message, errors, traceId);
-
-        context.Response.ContentType = "application/json";
-        context.Response.StatusCode = (int)statusCode;
-
-        var options = new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        };
-
-        await context.Response.WriteAsync(JsonSerializer.Serialize(response, options));
+        await context.WriteApiErrorAsync((int)statusCode, message, errors);
     }
 
     private HttpStatusCode GetStatusCode(Exception exception) =>

@@ -1,6 +1,6 @@
 using EnterpriseSmartHrm.Application.Common.Models;
 
-namespace EnterpriseSmartHrm.Application.Common.Abstractions;
+namespace EnterpriseSmartHrm.Application.Common.Interfaces;
 
 public interface IAuditLogService
 {

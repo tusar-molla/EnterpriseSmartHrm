@@ -1,9 +1,9 @@
 using Dapper;
-using EnterpriseSmartHrm.Application.Authentication.Abstractions;
-using EnterpriseSmartHrm.Application.Common.Abstractions;
+using EnterpriseSmartHrm.Application.Common.Interfaces;
+using EnterpriseSmartHrm.Application.Features.Authentication.Interfaces;
 using EnterpriseSmartHrm.Domain.Authentication;
 
-namespace EnterpriseSmartHrm.Infrastructure.Authentication.Repositories;
+namespace EnterpriseSmartHrm.Infrastructure.Repositories;
 
 public sealed class UserRepository : IUserRepository
 {

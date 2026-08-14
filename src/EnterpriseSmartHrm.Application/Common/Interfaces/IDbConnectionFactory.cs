@@ -1,6 +1,6 @@
 using System.Data.Common;
 
-namespace EnterpriseSmartHrm.Application.Common.Abstractions;
+namespace EnterpriseSmartHrm.Application.Common.Interfaces;
 
 public interface IDbConnectionFactory
 {

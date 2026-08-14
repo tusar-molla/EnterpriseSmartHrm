@@ -6,7 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using System.Text;
 
-namespace EnterpriseSmartHrm.Api.DependencyInjection;
+namespace EnterpriseSmartHrm.Api.Extensions;
 
 public static class JwtAuthenticationExtensions
 {
@@ -55,6 +55,28 @@ public static class JwtAuthenticationExtensions
                     ClockSkew = TimeSpan.Zero,
                     NameClaimType = ClaimTypes.NameIdentifier,
                     RoleClaimType = ClaimTypes.Role
+                };
+
+                // Authentication and authorization failures are produced by this middleware,
+                // before the request reaches ExceptionHandlingMiddleware. Without these events
+                // they return a bare status code with no body, breaking the ApiResponse contract.
+                options.Events = new JwtBearerEvents
+                {
+                    OnChallenge = context =>
+                    {
+                        context.HandleResponse();
+
+                        var message = context.AuthenticateFailure is SecurityTokenExpiredException
+                            ? "Access token has expired."
+                            : "Authentication is required.";
+
+                        return context.HttpContext.WriteApiErrorAsync(
+                            StatusCodes.Status401Unauthorized,
+                            message);
+                    },
+                    OnForbidden = context => context.HttpContext.WriteApiErrorAsync(
+                        StatusCodes.Status403Forbidden,
+                        "You do not have permission to perform this action.")
                 };
             });
 

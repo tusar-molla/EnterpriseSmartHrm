@@ -1,7 +1,7 @@
 using MediatR;
 using Microsoft.Extensions.Logging;
 
-namespace EnterpriseSmartHrm.Application.Common.Behaviors;
+namespace EnterpriseSmartHrm.Application.Common.Pipeline;
 
 public sealed class UnhandledExceptionBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     where TRequest : notnull

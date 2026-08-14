@@ -1,6 +1,18 @@
-@EnterpriseSmartHrm.Api_HostAddress = http://localhost:5230
+@host = http://localhost:5230
+@token = PASTE_ACCESS_TOKEN_HERE
 
-GET {{EnterpriseSmartHrm.Api_HostAddress}}/weatherforecast/
-Accept: application/json
+### Health
+GET {{host}}/health
 
-###
+### Login
+POST {{host}}/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "usernameOrEmail": "admin",
+  "password": "Admin@123"
+}
+
+### Example of calling a protected endpoint
+GET {{host}}/api/v1/employees
+Authorization: Bearer {{token}}

@@ -1,7 +1,7 @@
 using FluentValidation;
 using MediatR;
 
-namespace EnterpriseSmartHrm.Application.Common.Behaviors;
+namespace EnterpriseSmartHrm.Application.Common.Pipeline;
 
 public sealed class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     where TRequest : notnull
